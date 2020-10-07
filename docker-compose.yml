@@ -1,0 +1,35 @@
+version: "2"
+services:
+  postgre_12_rw:
+    image: postgres:12
+    ports:
+      - "127.0.0.1:54321:5432"
+    volumes:
+      - ./iso-3166.sql:/docker-entrypoint-initdb.d/init.sql
+      - "postgre_12_rw_data:/var/lib/postgresql/data/"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+  postgre_12_ro:
+    image: postgres:12
+    ports:
+      - "127.0.0.1:54322:5432"
+    volumes:
+      - ./ini_fdw.sh:/ini_fdw.sh
+      - "postgre_12_ro_data:/var/lib/postgresql/data/"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    depends_on:
+      - postgre_12_rw
+  adminer:
+    image: adminer:latest
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      - postgre_12_rw
+volumes:
+  postgre_12_rw_data:
+  postgre_12_ro_data:
